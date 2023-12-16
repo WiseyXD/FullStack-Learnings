@@ -19,3 +19,22 @@ const express =  require("express");
 const bodyParser = require("body-parser");
 const app = express();
 const PORT  = 8000;
+
+app.use(express.static("files"))
+
+app.get("/files",(req,res)=>{
+    fs.readdir("files" , (err,resp)=>{
+        if(err)
+        {
+            console.log(err);
+            return res.status(500).send("Error Reading Directory")
+        }
+        res.json({resp})
+    })
+})
+
+
+
+app.listen(PORT , ()=>{
+    console.log("Listening at "+PORT)
+})
