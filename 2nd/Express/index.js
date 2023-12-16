@@ -31,7 +31,7 @@ app.get("/", (req, res) => {
     let numberOfUnhealthyKidneys = user.kidneys.length - numberOfHealthyKidneys;  
     console.log(numberOfHealthyKidneys , numberOfUnhealthyKidneys)
     res.status(200).json(
-       {
+    {
         username,
         numberOfHealthyKidneys,
         numberOfUnhealthyKidneys}
@@ -40,7 +40,12 @@ app.get("/", (req, res) => {
 
 
 // TODO : Convert all Unhealthy Kidney to Healthy Kidneys
-app.put("/", (req, res) => {});
+app.put("/", (req, res) => {
+    users[0].kidneys = users[0].kidneys.map((kidney)=> kidney.healthy = true);
+    res.json({
+        msg : "Done PUT"
+    })
+});
 
 app.post("/", (req, res) => {
     const isHealthy = req.body.isHealthy;
@@ -50,12 +55,25 @@ app.post("/", (req, res) => {
         }
     })
     res.json({
-        msg : "Done"
+        msg : "Done POST"
     })
 });
 
-// TODO : Delete all Unhealth kidneys
-app.delete("/", (req, res) => {});
+// TODO : Delete all Unhealthy kidneys
+app.delete("/", (req, res) => {
+    if(users[0].kidneys.length === 0 )
+    {
+        res.json({
+            msg : "No Kidneys Left"
+        })
+        return 
+    }
+    const onlyHealthyKidneys = users[0].kidneys.filter((kidney)=> kidney[Object.keys(kidney)[0]].healthy == true)
+    users[0].kidneys = onlyHealthyKidneys;
+    res.json({
+        msg : "Done DELETE"
+    })
+});
 
 app.listen(PORT, () => {
     console.log("Listening at" + PORT);
