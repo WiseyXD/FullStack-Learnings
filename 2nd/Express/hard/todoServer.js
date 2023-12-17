@@ -45,3 +45,59 @@ const bodyParser = require("body-parser");
 const PORT = 2000;
 const app = express();
 app.use(express.json());
+
+let todos = [
+    {
+        id:1,
+        message : "Buy Milk"
+    },
+];
+
+app.get("/todos" , (req,res)=>{
+    res.status(200).json({todos})
+})
+
+app.get("/todos/:id",(req,res)=>{
+    const id = req.params.id;
+    const searchByIdTodo =  todos.find((todo)=>todo.id === id);
+    res.status(200).json({searchByIdTodo});
+})
+
+app.post("/todos",(req,res)=>{
+    const message = req.body.message;
+    const id = req.body.id;
+    todos.push({
+        id,
+        message,
+    })
+    res.status(200).json({
+        message : "Done POST"
+    })
+})
+
+app.put("/todos/:id",(req,res)=>{
+    const id = req.params.id;
+    const message = req.body.message;
+    let updatedTodos = todos.filter((todo)=>todo.id !== id);
+    updatedTodos.push({
+        id,
+        message
+    })
+    todos = updatedTodos;
+    res.status(200).json({
+        message : "Done PUT"
+    })
+})
+
+app.delete("/todos/:id",(req , res)=>{
+    const id = req.params.id;
+    let updatedTodos = todos.filter((todo)=>todo.id !== id);
+    todos = updatedTodos;
+    res.status(200).json({
+        msg : "Done DELETE"
+    })
+})
+
+app.listen(PORT , ()=>{
+    console.log("Server is listening at "+PORT);
+})
