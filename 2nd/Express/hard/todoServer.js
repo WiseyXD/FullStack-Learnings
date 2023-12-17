@@ -60,6 +60,14 @@ app.get("/todos" , (req,res)=>{
 app.get("/todos/:id",(req,res)=>{
     const id = req.params.id;
     const searchByIdTodo =  todos.find((todo)=>todo.id === id);
+    console.log(searchByIdTodo);
+    if(searchByIdTodo === undefined)
+    {
+        res.status(404).json({
+            message : "404 Not found"
+        })
+        return;
+    }
     res.status(200).json({searchByIdTodo});
 })
 
@@ -70,7 +78,7 @@ app.post("/todos",(req,res)=>{
         id,
         message,
     })
-    res.status(200).json({
+    res.status(201).json({
         message : "Done POST"
     })
 })
@@ -78,6 +86,15 @@ app.post("/todos",(req,res)=>{
 app.put("/todos/:id",(req,res)=>{
     const id = req.params.id;
     const message = req.body.message;
+    const searchByIdTodo =  todos.find((todo)=>todo.id === id);
+    console.log(searchByIdTodo);
+    if(searchByIdTodo === undefined)
+    {
+        res.status(404).json({
+            message : "404 Not found"
+        })
+        return;
+    }
     let updatedTodos = todos.filter((todo)=>todo.id !== id);
     updatedTodos.push({
         id,
@@ -91,6 +108,15 @@ app.put("/todos/:id",(req,res)=>{
 
 app.delete("/todos/:id",(req , res)=>{
     const id = req.params.id;
+    const searchByIdTodo =  todos.find((todo)=>todo.id === id);
+    console.log(searchByIdTodo);
+    if(searchByIdTodo === undefined)
+    {
+        res.status(404).json({
+            message : "404 Not found"
+        })
+        return;
+    }
     let updatedTodos = todos.filter((todo)=>todo.id !== id);
     todos = updatedTodos;
     res.status(200).json({
