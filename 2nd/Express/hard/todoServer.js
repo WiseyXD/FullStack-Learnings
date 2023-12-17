@@ -40,87 +40,117 @@
   Testing the server - run `npm run test-todoServer` command in terminal
  */
 
+
+
+const fs = require("fs")
 const express = require("express");
 const bodyParser = require("body-parser");
 const PORT = 2000;
 const app = express();
-app.use(express.json());
 
-let todos = [
-    {
-        id:1,
-        message : "Buy Milk"
-    },
-];
+app.use(bodyParser.json())
+
+// let todos = [
+//     {
+//         id:1,
+//         message : "Buy Milk"
+//     },
+// ];
 
 app.get("/todos" , (req,res)=>{
-    res.status(200).json({todos})
+    fs.readFile("todos.json","utf-8",(err,data)=>{
+        if (err) throw err;
+        res.status(200).json(JSON.parse(data))
+    })
 })
 
 app.get("/todos/:id",(req,res)=>{
-    const id = req.params.id;
-    const searchByIdTodo =  todos.find((todo)=>todo.id === id);
-    console.log(searchByIdTodo);
-    if(searchByIdTodo === undefined)
-    {
-        res.status(404).json({
-            message : "404 Not found"
-        })
-        return;
-    }
-    res.status(200).json({searchByIdTodo});
+    const id = parseInt(req.params.id);
+    fs.readFile("todos.json","utf-8",(err,data)=>{
+        if (err) throw err;
+        let todos = JSON.parse(data);
+        const searchByIdTodo =  todos.find((todo)=>todo.id === id);
+        if(searchByIdTodo === undefined)
+        {
+            res.status(404).json({
+                message : "404 Not found"
+            })
+            return;
+        }
+        res.status(200).json({searchByIdTodo});
+    })
 })
 
+// Create new Todo
 app.post("/todos",(req,res)=>{
     const message = req.body.message;
     const id = req.body.id;
-    todos.push({
-        id,
-        message,
-    })
-    res.status(201).json({
-        message : "Done POST"
+    fs.readFile("todos.json","utf-8",(err,data)=>{
+        if(err) throw err;
+        let todos = JSON.parse(data);
+        todos.push({
+            id,
+            message,
+        })
+        fs.writeFile("todos.json",JSON.stringify(todos),(err)=>{
+            if(err) throw err;
+            res.status(201).json({
+                message : "Done POST"
+            })
+        })
     })
 })
 
+// update an exisiting todo
 app.put("/todos/:id",(req,res)=>{
-    const id = req.params.id;
     const message = req.body.message;
-    const searchByIdTodo =  todos.find((todo)=>todo.id === id);
-    console.log(searchByIdTodo);
-    if(searchByIdTodo === undefined)
-    {
-        res.status(404).json({
-            message : "404 Not found"
+    const id = parseInt(req.params.id);
+    fs.readFile("todos.json","utf-8",(err,data)=>{
+        if (err) throw err;
+        let todos = JSON.parse(data);
+        const searchByIdTodo =  todos.find((todo)=>todo.id === id);
+        if(searchByIdTodo === undefined)
+        {
+            res.status(404).json({
+                message : "404 Not found"
+            })
+            return;
+        }
+        let updatedTodos = todos.filter((todo)=>todo.id !== id);
+        updatedTodos.push({
+            id,
+            message
         })
-        return;
-    }
-    let updatedTodos = todos.filter((todo)=>todo.id !== id);
-    updatedTodos.push({
-        id,
-        message
-    })
-    todos = updatedTodos;
-    res.status(200).json({
-        message : "Done PUT"
+        fs.writeFile("todos.json",JSON.stringify(updatedTodos),(err)=>{
+            if(err) throw err;
+            res.status(200).json({
+                message : "Done PUT"
+            })
+        })
     })
 })
 
+// Delelte a Todo
 app.delete("/todos/:id",(req , res)=>{
-    const id = req.params.id;
-    const searchByIdTodo =  todos.find((todo)=>todo.id === id);
-    console.log(searchByIdTodo);
-    if(searchByIdTodo === undefined)
-    {
-        res.status(404).json({
-            message : "404 Not found"
+    const id = parseInt(req.params.id);
+    fs.readFile("todos.json","utf-8",(err,data)=>{
+        if(err) throw err;
+        todos = JSON.parse(data);
+        const searchByIdTodo =  todos.find((todo)=>todo.id === id);
+        if(searchByIdTodo === undefined)
+        {
+            res.status(404).json({
+                message : "404 Not found"
+            })
+            return;
+        }
+        let updatedTodos = todos.filter((todo)=>todo.id !== id);
+        fs.writeFile("todos.json",JSON.stringify(updatedTodos),(err)=>{
+            if(err) throw err;
+            res.status(200).json({
+                msg : "Done DELETE"
+            })
         })
-        return;
-    }
-    let updatedTodos = todos.filter((todo)=>todo.id !== id);
-    todos = updatedTodos;
-    res.status(200).json({
-        msg : "Done DELETE"
     })
 })
 
